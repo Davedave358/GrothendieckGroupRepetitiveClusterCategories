@@ -62,24 +62,24 @@ def type_d(n:int,p:int) -> str:
         pass
 
     eq_classes : int = gcd(n-1,p) # counts equivalence classes of S_i induced by the relations S_i +- S_i+p
-    if eq_classes == p:
+    if eq_classes == p and eq_classes !=1:
         eq_classes  = eq_classes -1 # deals with edge case where the injective at n is counted as its own equivalence class above
 
     a : list = [symbols('a%d' % i) for i in range(0,eq_classes)] # names all of the equivalence classes of simple objects (except at vertex 0 and 1)
 
     l = np.array(a) # converts above into an array for computation
 
-    neg_a = l*(-1) # negates a for computation
+    a_neg :list = list(l*(-1)) # negates a for computation
 
     for i in range(eq_classes,n-2):
         for j in range(0,(n-1)/eq_classes):
-            if (j*p+i)%(n-1) == i:
-                if (p + (j*p-i)/(n-1))%2 == 1:
-                    a.append(neg_a[i%eq_classes])  # finds S_i+jp in terms of S_i subject to the relation S_i + S_i+jp
+            if (j*p+i)%(n-1) != i:
+                pass
+            else:
+                if (p + (j*p-i)%(n-1) )%2 == 1:
+                    a.append(a_neg[i%eq_classes])  # finds S_i+jp in terms of S_i subject to the relation S_i + S_i+jp
                 else:
                     a.append(a[i%eq_classes]) # same as above with relation S_i - S_i+jp
-            else:
-                pass
 
     x,y = symbols('x y') # names the simple objects at vertex 1 and 0
 
@@ -92,11 +92,11 @@ def type_d(n:int,p:int) -> str:
     # next we deal with three cases of p > n-1, p = n-1, p < n-1, and subcases of p mod 2
     if p >= n:
         if p%2 == 0:
-            d.append(a[2*(n-1)-p] + neg_sim), # includes the relation S_i - I_n
+            d.append(a[2*(n-1)-1-p] + neg_sim), # includes the relation S_i - I_n
             d.append(x + x + sum(a[0:p-n+1])), # includes the relation S_0 - phi^p S_0
             d.append(y + y + sum(a[0:p-n+1])) # as above with S_1
         if p%2 == 1:
-            d.append(a[2*(n-1)-p] + simples), # relation S_i + I_n
+            d.append(a[2*(n-1)-1-p] + simples), # relation S_i + I_n
             d.append(sum(a[0:p])) # relations S_0 + phi^p S_0, and with S_1
 
     if p == n-1:
@@ -108,10 +108,10 @@ def type_d(n:int,p:int) -> str:
 
     if p <= n-2:
         if p%2 == 0:
-            d.append(a[n-1-p] + simples), # relation S_i - I_n
+            d.append(a[n-2-p] + simples), # relation S_i - I_n
             d.append(sum(a[0:p])), # relations with S_0 and S_1
         if p%2 == 1:
-            d.append(a[n-1-p] + neg_sim), # relation S_i - I_n
+            d.append(a[n-2-p] + neg_sim), # relation S_i - I_n
             d.append(x + y + sum(a[0:p])), # relations with S_0 and S_1
 
     if n%2 == 1 and p%(2*(n-1)) != 1 and p%(2*(n-1)) != 2*n-3:
